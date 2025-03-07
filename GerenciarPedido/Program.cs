@@ -1,46 +1,82 @@
 ﻿using GerenciarPedido.Models;
 using System;
+using System.Net.Sockets;
 
-List<Client> clients = new List<Client>()
-{
+Random random = new Random();
+
+List<Client> clients =
+[
     new()
     {
-        Id = 1,
+        Id = new Guid("9d0e7a50-6e04-4dc1-aec5-441e19efda96"),
         Name = "Chris",
     },
 
     new()
     {
-        Id = 2,
+        Id = new Guid("9d0e7a50-6e04-4dc1-aec5-441e19efda97"),
         Name = "Thay",
     },
 
     new()
     {
-        Id = 3,
+        Id = new Guid("9d0e7a50-6e04-4dc1-aec5-441e19efda98"),
         Name = "Dei",
     },
-};
+];
 
+List<Order> orders = [];
 
-List<Order> orders = new List<Order>();
-
-bool isExistClient(string id)
+void listOrders(IEnumerable<Order> ordersParam)
 {
-    IEnumerable<Client> clientQuery = from client in clients where (client.Id == int.Parse(id)) select client;
-
-    return clientQuery.Any();
-
+    foreach (var item in ordersParam)
+    {
+        Console.WriteLine($"{item.Id} - {item.ClientID} - {item.Value} - {item.Date}");
+    }
 }
 
 void validateOptionNull(string? option)
 {
     if (string.IsNullOrEmpty(option))
     {
-        Console.WriteLine("Opção escolhida inexistente");
+        Console.WriteLine("Nenhuma opção escolhida!");
         menu();
     }
 }
+
+Client getClient(Action action)
+{
+    Console.WriteLine("Escolha o id do cliente:");
+
+    foreach (var client in clients)
+    {
+        Console.WriteLine($"{client.Id} - {client.Name}");
+    }
+
+    string? idClient = Console.ReadLine();
+
+    validateOptionNull(idClient);
+
+    if (!Guid.TryParse(idClient, out Guid id))
+    {
+        Console.WriteLine("ID inválido! Tente novamente.");
+        menu();
+    }
+
+    IEnumerable<Client> clientQuery = from client in clients where (client.Id == id) select client;
+
+
+    if (!clientQuery.Any())
+    {
+        Console.WriteLine($"{idClient} não existe!");
+        action();
+    }
+
+    return clientQuery.First();
+}
+
+menu();
+
 
 void menu()
 {
@@ -58,10 +94,10 @@ void menu()
     switch (idAction)
     {
         case ("1"):
-            Console.WriteLine("Chama a função de cadastrar");
+            register();
             break;
         case ("2"):
-            Console.WriteLine("Chama a função de Listar");
+            listAll();
             break;
         case ("3"):
             Console.WriteLine("Chama a função de Buscar");
@@ -80,23 +116,36 @@ void menu()
 
 void register()
 {
-    Console.WriteLine("Escolha o id do cliente para atribuir o pedido:");
-    foreach (var client in clients)
+    Client client = getClient(register);
+
+
+    orders.Add(new Order()
     {
-        Console.WriteLine($"{client.Id} - {client.Name}");
-    }
+        ClientID = client.Id,
+        Date = DateTime.Now,
+        Value = 2.6,
+        Id = random.Next()
+    });
 
-    string? idClient = Console.ReadLine();
-
-    validateOptionNull(idClient);
-
-    bool isExist = isExistClient(idClient);
-
-    if (!isExist)
-    {
-        register();
-    }
+    menu();
 
 }
 
-menu();
+void listAll()
+{
+    listOrders(orders);
+   
+    menu();
+}
+
+void searchProduct()
+{
+    Client client = getClient(searchProduct);
+
+    IEnumerable<Order> ordersQuery = from order in orders where (order.ClientID == client.Id) select order;
+
+    listOrders(ordersQuery);
+
+    menu();
+
+}
