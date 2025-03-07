@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "GerenciarPedido/1.0.0": {
+        "runtime": {
+          "GerenciarPedido.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "GerenciarPedido/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
